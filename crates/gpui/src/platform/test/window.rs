@@ -573,6 +573,11 @@ impl PlatformWindow for TestWindow {
         self.0.lock().sprite_atlas.clone()
     }
 
+    fn render_target_texture(&self) -> Option<Box<dyn std::any::Any>> {
+        let state = self.0.lock();
+        state.renderer.as_ref()?.render_target_texture()
+    }
+
     #[cfg(any(test, feature = "test-support", feature = "headless"))]
     fn render_to_image(&self, scene: &Scene) -> anyhow::Result<RgbaImage> {
         let scale_factor = self.scale_factor();

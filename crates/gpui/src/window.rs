@@ -3119,6 +3119,14 @@ impl Window {
     /// Renders the current frame's scene to a texture and returns the pixel data as an RGBA image.
     /// This does not present the frame to screen - useful for visual testing where we want
     /// to capture what would be rendered without displaying it or requiring the window to be visible.
+    /// The offscreen texture the last draw rendered into, when the platform
+    /// keeps one. A headless Spore presents this to its host instead of paying
+    /// for a pixel readback and a second upload.
+    #[cfg(any(test, feature = "test-support", feature = "headless"))]
+    pub fn render_target_texture(&self) -> Option<Box<dyn std::any::Any>> {
+        self.platform_window.render_target_texture()
+    }
+
     #[cfg(any(test, feature = "test-support", feature = "headless"))]
     pub fn render_to_image(&self) -> anyhow::Result<image::RgbaImage> {
         self.platform_window

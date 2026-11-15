@@ -2602,6 +2602,14 @@ impl gpui::PlatformHeadlessRenderer for WgpuHeadlessRenderer {
     fn sprite_atlas(&self) -> Arc<dyn gpui::PlatformAtlas> {
         self.core.atlas.clone()
     }
+
+    /// The target the last `render_scene` drew into. It is created with
+    /// `COPY_SRC`, so a host can lift it or present it directly; a caller that
+    /// only wants pixels still uses `render_scene_to_image`.
+    fn render_target_texture(&self) -> Option<Box<dyn std::any::Any>> {
+        let target = self.render_target.as_ref()?;
+        Some(Box::new(target.texture.clone()))
+    }
 }
 
 fn instance_range(range: Range<usize>) -> Range<u32> {

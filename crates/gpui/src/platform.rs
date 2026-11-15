@@ -1497,6 +1497,12 @@ pub trait PlatformWindow: HasWindowHandle + HasDisplayHandle {
     fn render_to_image(&self, _scene: &Scene) -> Result<RgbaImage> {
         anyhow::bail!("render_to_image not implemented for this platform")
     }
+
+    /// The offscreen target the last draw rendered into, when the platform keeps
+    /// one. A Spore presents this instead of reading pixels back.
+    fn render_target_texture(&self) -> Option<Box<dyn std::any::Any>> {
+        None
+    }
 }
 
 /// A renderer for headless windows that can produce real rendered output.
@@ -1520,6 +1526,16 @@ pub trait PlatformHeadlessRenderer {
     /// same CPU-side scene encoding and GPU submission as drawing to a real
     /// window, but doesn't block on GPU completion or copy pixels back.
     fn render_scene(&mut self, scene: &Scene, size: Size<DevicePixels>) -> Result<()>;
+
+    /// The texture `render_scene` most recently drew into, when the renderer
+    /// has one.
+    ///
+    /// Type-erased on purpose: a Spore presents this texture and never looks
+    /// inside it, so the component layer does not need a GPU type in its
+    /// signature. A renderer that keeps no offscreen target returns `None`.
+    fn render_target_texture(&self) -> Option<Box<dyn std::any::Any>> {
+        None
+    }
 
     /// Returns the sprite atlas used by this renderer.
     fn sprite_atlas(&self) -> Arc<dyn PlatformAtlas>;
