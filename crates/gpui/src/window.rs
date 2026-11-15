@@ -3127,6 +3127,18 @@ impl Window {
         self.platform_window.render_target_texture()
     }
 
+    /// Renders the frame `draw` just built and hands back the texture it landed
+    /// in, without copying pixels to the CPU.
+    ///
+    /// `draw` composes the scene; presenting it to a window is the platform's
+    /// job. A headless Spore has no window, so this is the presenting step: the
+    /// host takes the texture and composites it.
+    #[cfg(any(test, feature = "test-support", feature = "headless"))]
+    pub fn render_to_texture(&self) -> Option<Box<dyn std::any::Any>> {
+        self.platform_window.draw(&self.rendered_frame.scene);
+        self.platform_window.render_target_texture()
+    }
+
     #[cfg(any(test, feature = "test-support", feature = "headless"))]
     pub fn render_to_image(&self) -> anyhow::Result<image::RgbaImage> {
         self.platform_window
